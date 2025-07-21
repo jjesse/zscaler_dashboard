@@ -1,12 +1,19 @@
 # Zscaler Mission Control Dashboard
 
-A comprehensive monitoring and management dashboard for Zscaler Zero Trust services including ZPA (Zero Trust Private Access), ZIA (Zero Trust Internet Access), and ZDX (Digital Employee Experience).
+A comprehensive monitoring and management dashboard for Zscaler Zero Trust services including ZPA (Zero Trust Private Access), ZIA (Zero Trust Internet Access), and ZDX (Digital Employee Experience), leveraging the **Zscaler OneAPI** for unified data access.
 
 ## Overview
 
-The Mission Control dashboard provides real-time visibility and insights across your entire Zscaler environment, leveraging the Zscaler OneAPI to aggregate data from multiple services into a unified view.
+The Mission Control dashboard provides real-time visibility and insights across your entire Zscaler environment, utilizing the **Zscaler OneAPI** to aggregate data from multiple services into a unified view. This modern approach replaces the need for separate API integrations and provides a streamlined, consistent interface.
 
 ## Features
+
+### Unified OneAPI Integration
+- **Single Authentication**: OAuth 2.0 authentication for all Zscaler services
+- **Consistent Data Models**: Standardized data formats across ZPA, ZIA, and ZDX
+- **Simplified Integration**: One API client for all Zscaler services
+- **Real-time Data**: Unified real-time data streaming from all services
+- **Enhanced Security**: Modern OAuth 2.0 with scope-based access control
 
 ### ZPA (Zero Trust Private Access) Monitoring
 - Application connector status and health
@@ -32,35 +39,37 @@ The Mission Control dashboard provides real-time visibility and insights across 
 ## Architecture
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   ZPA API       │    │   ZIA API       │    │   ZDX API       │
-│   (Private      │    │   (Internet     │    │   (Digital      │
-│    Access)      │    │    Access)      │    │   Experience)   │
-└─────────┬───────┘    └─────────┬───────┘    └─────────┬───────┘
-          │                      │                      │
-          └──────────────────────┼──────────────────────┘
-                                 │
-                    ┌─────────────▼─────────────┐
-                    │   Zscaler OneAPI          │
-                    │   Integration Layer       │
-                    └─────────────┬─────────────┘
-                                  │
-                    ┌─────────────▼─────────────┐
-                    │   Mission Control         │
-                    │   Dashboard               │
-                    │   (Web Interface)         │
-                    └───────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                  Zscaler OneAPI                            │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
+│  │   ZPA API   │  │   ZIA API   │  │   ZDX API   │        │
+│  │  (Private   │  │ (Internet   │  │  (Digital   │        │
+│  │   Access)   │  │   Access)   │  │Experience)  │        │
+│  └─────────────┘  └─────────────┘  └─────────────┘        │
+└─────────────────────┬───────────────────────────────────────┘
+                      │ OAuth 2.0 Authentication
+          ┌───────────▼───────────┐
+          │   Mission Control     │
+          │   OneAPI Client       │
+          └───────────┬───────────┘
+                      │
+          ┌───────────▼───────────┐
+          │   Mission Control     │
+          │   Dashboard           │
+          │   (Web Interface)     │
+          └───────────────────────┘
 ```
 
 ## Technology Stack
 
 - **Backend**: Python with FastAPI framework
+- **API Integration**: Zscaler OneAPI with OAuth 2.0
 - **Frontend**: React with TypeScript
 - **Data Visualization**: Chart.js / D3.js
 - **Real-time Updates**: WebSocket connections
 - **Database**: PostgreSQL for data persistence
 - **Caching**: Redis for performance optimization
-- **Authentication**: OAuth 2.0 integration with Zscaler
+- **Authentication**: OAuth 2.0 integration with Zscaler OneAPI
 - **Deployment**: Docker containers with Kubernetes orchestration
 
 ## Quick Start
@@ -70,7 +79,7 @@ The Mission Control dashboard provides real-time visibility and insights across 
 - Python 3.9+
 - Node.js 16+
 - Docker and Docker Compose
-- Zscaler API credentials for ZPA, ZIA, and ZDX
+- **Zscaler OneAPI credentials** (Client ID, Client Secret, Organization ID)
 
 ### Installation
 
@@ -83,7 +92,7 @@ cd zscaler-mission-control
 2. Set up environment variables:
 ```bash
 cp .env.example .env
-# Edit .env with your Zscaler API credentials
+# Edit .env with your Zscaler OneAPI credentials
 ```
 
 3. Install dependencies:
@@ -104,40 +113,43 @@ docker-compose up -d
 
 ## Configuration
 
-### API Configuration
+### OneAPI Configuration
 
-Create a `.env` file with your Zscaler API credentials:
+Create a `.env` file with your Zscaler OneAPI credentials:
 
 ```env
-# ZPA Configuration
-ZPA_CLIENT_ID=your_zpa_client_id
-ZPA_CLIENT_SECRET=your_zpa_client_secret
-ZPA_CUSTOMER_ID=your_zpa_customer_id
-ZPA_BASE_URL=https://config.private.zscaler.com
-
-# ZIA Configuration
-ZIA_USERNAME=your_zia_username
-ZIA_PASSWORD=your_zia_password
-ZIA_API_KEY=your_zia_api_key
-ZIA_CLOUD_NAME=your_zia_cloud
-
-# ZDX Configuration
-ZDX_API_KEY=your_zdx_api_key
-ZDX_KEY_SECRET=your_zdx_key_secret
-ZDX_BASE_URL=https://api.zdxcloud.net
+# Zscaler OneAPI Configuration
+ZSCALER_ONEAPI_BASE_URL=https://api.zscaler.com
+ZSCALER_CLIENT_ID=your_oneapi_client_id
+ZSCALER_CLIENT_SECRET=your_oneapi_client_secret
+ZSCALER_ORGANIZATION_ID=your_organization_id
+ZSCALER_OAUTH_URL=https://auth.zscaler.com/oauth/token
+ZSCALER_SCOPE=zpa:read zia:read zdx:read
 
 # Database Configuration
 DATABASE_URL=postgresql://user:password@localhost:5432/mission_control
 REDIS_URL=redis://localhost:6379
+
+# Legacy API Support (Optional)
+ENABLE_LEGACY_API=false
 ```
 
 ## API Documentation
 
-The dashboard integrates with multiple Zscaler APIs:
+The dashboard integrates with the **Zscaler OneAPI**, providing:
 
-- **ZPA API**: Private application access and connector management
-- **ZIA API**: Internet security and traffic analytics
-- **ZDX API**: Digital experience monitoring and analytics
+- **Unified Authentication**: Single OAuth 2.0 flow for all services
+- **Consistent Data Models**: Standardized response formats
+- **Comprehensive Coverage**: Full access to ZPA, ZIA, and ZDX data
+- **Real-time Capabilities**: WebSocket support for live updates
+
+### OneAPI Benefits
+
+1. **Simplified Integration**: One client, one authentication method
+2. **Better Performance**: Optimized data delivery and caching
+3. **Enhanced Security**: Modern OAuth 2.0 with granular scopes
+4. **Future-Proof**: Built for Zscaler's evolving platform
+5. **Consistent Experience**: Unified data models across services
 
 Detailed API documentation is available in the `/docs` directory.
 
@@ -152,7 +164,9 @@ zscaler-mission-control/
 │   │   ├── api/            # API route definitions
 │   │   ├── core/           # Core application logic
 │   │   ├── models/         # Database models
-│   │   └── services/       # Business logic services
+│   │   ├── services/       # Business logic services
+│   │   │   └── oneapi_client.py  # Zscaler OneAPI client
+│   │   └── utils/          # Utility functions
 │   ├── requirements.txt
 │   └── Dockerfile
 ├── frontend/               # React TypeScript frontend
@@ -180,30 +194,32 @@ cd frontend
 npm start
 ```
 
-## Contributing
+## Migration from Legacy APIs
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+If you're currently using separate ZPA, ZIA, and ZDX APIs, this dashboard provides a migration path:
+
+1. **Enable Legacy Support**: Set `ENABLE_LEGACY_API=true` in your `.env`
+2. **Gradual Migration**: Run both OneAPI and legacy APIs in parallel
+3. **Data Validation**: Compare results between OneAPI and legacy APIs
+4. **Full Cutover**: Disable legacy APIs once validation is complete
 
 ## Security Considerations
 
-- API credentials are stored securely using environment variables
-- All API communications use HTTPS/TLS encryption
-- Rate limiting is implemented to prevent API abuse
-- Authentication tokens are automatically refreshed
-- Sensitive data is encrypted at rest
+- **OAuth 2.0**: Modern authentication with scope-based access control
+- **Token Management**: Automatic token refresh and secure storage
+- **Secure Communication**: All API communications use HTTPS/TLS encryption
+- **Rate Limiting**: Built-in protection against API abuse
+- **Audit Logging**: Comprehensive logging of all API interactions
 
 ## Monitoring and Alerts
 
 The dashboard includes built-in monitoring capabilities:
 
-- Health checks for all Zscaler services
+- Health checks for OneAPI connectivity
 - Automated alerting for service disruptions
 - Performance metrics and SLA tracking
 - Custom alert thresholds and notifications
+- Real-time status monitoring across all services
 
 ## License
 
@@ -216,3 +232,7 @@ For questions, issues, or feature requests, please open an issue in the GitHub r
 ## Roadmap
 
 See [TODO.md](TODO.md) for current development tasks and future enhancements.
+
+---
+
+**Note**: This dashboard is designed for the **Zscaler OneAPI**. For legacy API support, please refer to the migration documentation.

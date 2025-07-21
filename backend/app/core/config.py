@@ -19,26 +19,37 @@ class Settings(BaseSettings):
     APP_PORT: int = 8000
     APP_CORS_ORIGINS: List[str] = ["http://localhost:3000"]
     
-    # ZPA Configuration
-    ZPA_CLIENT_ID: str
-    ZPA_CLIENT_SECRET: str
-    ZPA_CUSTOMER_ID: str
+    # Zscaler OneAPI Configuration
+    ZSCALER_ONEAPI_BASE_URL: str = "https://api.zscaler.com"
+    ZSCALER_ONEAPI_VERSION: str = "v1"
+    ZSCALER_CLIENT_ID: str
+    ZSCALER_CLIENT_SECRET: str
+    ZSCALER_ORGANIZATION_ID: str
+    
+    # OAuth 2.0 Configuration for OneAPI
+    ZSCALER_OAUTH_URL: str = "https://auth.zscaler.com/oauth/token"
+    ZSCALER_SCOPE: str = "zpa:read zia:read zdx:read"
+    
+    # Legacy API Support (Optional fallback)
+    ENABLE_LEGACY_API: bool = False
+    
+    # ZPA Legacy Configuration (if needed)
+    ZPA_CLIENT_ID: Optional[str] = None
+    ZPA_CLIENT_SECRET: Optional[str] = None
+    ZPA_CUSTOMER_ID: Optional[str] = None
     ZPA_BASE_URL: str = "https://config.private.zscaler.com"
-    ZPA_API_VERSION: str = "v1"
     
-    # ZIA Configuration
-    ZIA_USERNAME: str
-    ZIA_PASSWORD: str
-    ZIA_API_KEY: str
-    ZIA_CLOUD_NAME: str
+    # ZIA Legacy Configuration (if needed)
+    ZIA_USERNAME: Optional[str] = None
+    ZIA_PASSWORD: Optional[str] = None
+    ZIA_API_KEY: Optional[str] = None
+    ZIA_CLOUD_NAME: Optional[str] = None
     ZIA_BASE_URL: str = "https://admin.{cloud_name}.net"
-    ZIA_API_VERSION: str = "v1"
     
-    # ZDX Configuration
-    ZDX_API_KEY: str
-    ZDX_KEY_SECRET: str
+    # ZDX Legacy Configuration (if needed)
+    ZDX_API_KEY: Optional[str] = None
+    ZDX_KEY_SECRET: Optional[str] = None
     ZDX_BASE_URL: str = "https://api.zdxcloud.net"
-    ZDX_API_VERSION: str = "v1"
     
     # Database Configuration
     DATABASE_URL: str
@@ -104,24 +115,24 @@ class Settings(BaseSettings):
         case_sensitive = True
     
     @property
-    def zia_formatted_base_url(self) -> str:
-        """Format ZIA base URL with cloud name"""
-        return self.ZIA_BASE_URL.format(cloud_name=self.ZIA_CLOUD_NAME)
+    def oneapi_url(self) -> str:
+        """Complete Zscaler OneAPI URL"""
+        return f"{self.ZSCALER_ONEAPI_BASE_URL}/{self.ZSCALER_ONEAPI_VERSION}"
     
     @property
-    def zpa_api_url(self) -> str:
-        """Complete ZPA API URL"""
-        return f"{self.ZPA_BASE_URL}/mgmtconfig/{self.ZPA_API_VERSION}"
+    def oneapi_zpa_url(self) -> str:
+        """OneAPI ZPA endpoint"""
+        return f"{self.oneapi_url}/zpa"
     
     @property
-    def zia_api_url(self) -> str:
-        """Complete ZIA API URL"""
-        return f"{self.zia_formatted_base_url}/api/{self.ZIA_API_VERSION}"
+    def oneapi_zia_url(self) -> str:
+        """OneAPI ZIA endpoint"""
+        return f"{self.oneapi_url}/zia"
     
     @property
-    def zdx_api_url(self) -> str:
-        """Complete ZDX API URL"""
-        return f"{self.ZDX_BASE_URL}/{self.ZDX_API_VERSION}"
+    def oneapi_zdx_url(self) -> str:
+        """OneAPI ZDX endpoint"""
+        return f"{self.oneapi_url}/zdx"
 
 
 # Create global settings instance
